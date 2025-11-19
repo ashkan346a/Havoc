@@ -1,0 +1,12 @@
+client/Build
+client/Bin
+client/Havoc
+client/Modules
+havoc
+*.db
+*.log
+data/loot
+data/x86_64-w64-mingw32-cross
+data/i686-w64-mingw32-cross
+.vscode
+.idea
