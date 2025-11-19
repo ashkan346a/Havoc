@@ -1,5 +1,7 @@
 FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -12,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     libqt5websockets5-dev \
     python3-dev \
     mingw-w64 \
+    tar \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go 1.21
@@ -28,8 +32,14 @@ COPY . .
 # Fix go.mod version
 RUN sed -i 's/go 1.21.0/go 1.21/' teamserver/go.mod
 
-# Download mingw cross-compilers
-RUN cd teamserver && bash Install.sh
+# Download and extract mingw cross-compilers
+RUN mkdir -p data && \
+    cd data && \
+    wget -q https://musl.cc/x86_64-w64-mingw32-cross.tgz && \
+    wget -q https://musl.cc/i686-w64-mingw32-cross.tgz && \
+    tar xf x86_64-w64-mingw32-cross.tgz && \
+    tar xf i686-w64-mingw32-cross.tgz && \
+    rm *.tgz
 
 # Build teamserver
 RUN cd teamserver && \
