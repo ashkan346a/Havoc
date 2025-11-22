@@ -7,6 +7,7 @@ type HavocConfig struct {
 	Demon     *Demon          `yaotl:"Demon,block"`
 	Service   *ServiceConfig  `yaotl:"Service,block"`
 	WebHook   *WebHookConfig  `yaotl:"WebHook,block"`
+	Database  *DatabaseConfig `yaotl:"Database,block"`
 }
 
 type WebHookDiscordConfig struct {
@@ -28,6 +29,16 @@ type BuildConfig struct {
 type ServiceConfig struct {
 	Endpoint string `yaotl:"Endpoint"`
 	Password string `yaotl:"Password"`
+}
+
+type DatabaseConfig struct {
+	Type     string `yaotl:"Type"`
+	Host     string `yaotl:"Host,optional"`
+	Port     int    `yaotl:"Port,optional"`
+	User     string `yaotl:"User,optional"`
+	Password string `yaotl:"Password,optional"`
+	Name     string `yaotl:"Name,optional"`
+	SSLMode  string `yaotl:"SSLMode,optional"`
 }
 
 type ServerProfile struct {

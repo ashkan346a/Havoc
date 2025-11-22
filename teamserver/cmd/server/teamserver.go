@@ -208,16 +208,46 @@ func (t *Teamserver) Start() {
 
 	/* now load up our db or start a new one if none exist */
 	DBPath := t.DB.Path()
-	if t.DB, err = db.DatabaseNew(TeamserverPath + "/" + DBPath); err != nil {
-		logger.SetStdOut(os.Stderr)
-		logger.Error("Failed to create or open a database: " + err.Error())
-		return
-	}
-
-	if t.DB.Existed() {
-		logger.Info("Opens existing database: " + colors.Blue(DBPath))
+	
+	// Check if Database config is provided in profile
+	if t.Profile.Config.Database != nil && t.Profile.Config.Database.Type == "postgres" {
+		// Use Postgres
+		sslMode := t.Profile.Config.Database.SSLMode
+		if sslMode == "" {
+			sslMode = "disable"
+		}
+		
+		if t.DB, err = db.DatabaseNewPostgres(
+			t.Profile.Config.Database.Host,
+			t.Profile.Config.Database.Port,
+			t.Profile.Config.Database.User,
+			t.Profile.Config.Database.Password,
+			t.Profile.Config.Database.Name,
+			sslMode,
+		); err != nil {
+			logger.SetStdOut(os.Stderr)
+			logger.Error("Failed to create or open Postgres database: " + err.Error())
+			return
+		}
+		
+		if t.DB.Existed() {
+			logger.Info("Connected to existing Postgres database: " + colors.Blue(t.Profile.Config.Database.Name))
+		} else {
+			logger.Info("Created new Postgres database schema: " + colors.Blue(t.Profile.Config.Database.Name))
+		}
 	} else {
-		logger.Info("Creates new database: " + colors.Blue(DBPath))
+		// Use SQLite (default)
+		if t.DB, err = db.DatabaseNew(TeamserverPath + "/" + DBPath); err != nil {
+			logger.SetStdOut(os.Stderr)
+			logger.Error("Failed to create or open a database: " + err.Error())
+			return
+		}
+		
+		if t.DB.Existed() {
+			logger.Info("Opens existing database: " + colors.Blue(DBPath))
+		} else {
+			logger.Info("Creates new database: " + colors.Blue(DBPath))
+		}
 	}
 
 	ListenerCount = t.DB.ListenerCount()

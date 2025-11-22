@@ -9,6 +9,22 @@ Teamserver {
     }
 }
 
+# Database configuration
+# Use "sqlite" for local SQLite database (default)
+# Use "postgres" for PostgreSQL database (recommended for production/Railway)
+Database {
+    Type = "postgres"
+    Host = "${PGHOST}"
+    Port = ${PGPORT}
+    User = "${POSTGRES_USER}"
+    Password = "${POSTGRES_PASSWORD}"
+    Name = "${PGDATABASE}"
+    SSLMode = "disable"
+}
+
+# For local SQLite database, comment out the Database block above
+# and the teamserver will use the default SQLite database
+
 Operators {
     user "5pider" {
         Password = "password1234"

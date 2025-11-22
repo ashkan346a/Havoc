@@ -1,0 +1,50 @@
+Teamserver {
+    Host = "0.0.0.0"
+    Port = 40056
+
+    Build {
+        Compiler64 = "data/x86_64-w64-mingw32-cross/bin/x86_64-w64-mingw32-gcc"
+        Compiler86 = "data/i686-w64-mingw32-cross/bin/i686-w64-mingw32-gcc"
+        Nasm = "/usr/bin/nasm"
+    }
+}
+
+# PostgreSQL Database Configuration for Railway
+# Railway automatically injects these environment variables
+Database {
+    Type = "postgres"
+    Host = "${PGHOST}"                      # postgres-nfwo.railway.internal
+    Port = ${PGPORT}                        # 5432
+    User = "${POSTGRES_USER}"               # postgres
+    Password = "${POSTGRES_PASSWORD}"       # Your password from Railway
+    Name = "${PGDATABASE}"                  # railway
+    SSLMode = "disable"                     # "disable" for internal Railway network, "require" for external
+}
+
+Operators {
+    user "admin" {
+        Password = "${HAVOC_ADMIN_PASSWORD}"
+    }
+
+    user "operator" {
+        Password = "${HAVOC_OPERATOR_PASSWORD}"
+    }
+}
+
+# Optional: Service endpoint for external integrations
+Service {
+    Endpoint = "${SERVICE_ENDPOINT}"
+    Password = "${SERVICE_PASSWORD}"
+}
+
+Demon {
+    Sleep = 2
+    Jitter = 15
+
+    TrustXForwardedFor = false
+
+    Injection {
+        Spawn64 = "C:\\Windows\\System32\\notepad.exe"
+        Spawn32 = "C:\\Windows\\SysWOW64\\notepad.exe"
+    }
+}
