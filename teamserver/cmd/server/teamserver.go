@@ -209,9 +209,44 @@ func (t *Teamserver) Start() {
 	/* now load up our db or start a new one if none exist */
 	DBPath := t.DB.Path()
 	
-	// Check if Database config is provided in profile
-	if t.Profile.Config.Database != nil && t.Profile.Config.Database.Type == "postgres" {
-		// Use Postgres
+	// Check for PostgreSQL environment variables (Railway, Docker, etc.)
+	pgHost := os.Getenv("PGHOST")
+	pgUser := os.Getenv("POSTGRES_USER")
+	pgPassword := os.Getenv("POSTGRES_PASSWORD")
+	pgDatabase := os.Getenv("PGDATABASE")
+	pgPort := 5432 // Default PostgreSQL port
+	
+	// If all required env vars are present, use PostgreSQL
+	if pgHost != "" && pgUser != "" && pgPassword != "" && pgDatabase != "" {
+		logger.Info("PostgreSQL environment variables detected, using Postgres database")
+		
+		sslMode := os.Getenv("PGSSLMODE")
+		if sslMode == "" {
+			sslMode = "disable"
+		}
+		
+		if t.DB, err = db.DatabaseNewPostgres(
+			pgHost,
+			pgPort,
+			pgUser,
+			pgPassword,
+			pgDatabase,
+			sslMode,
+		); err != nil {
+			logger.SetStdOut(os.Stderr)
+			logger.Error("Failed to create or open Postgres database: " + err.Error())
+			return
+		}
+		
+		if t.DB.Existed() {
+			logger.Info("Connected to existing Postgres database: " + colors.Blue(pgDatabase))
+		} else {
+			logger.Info("Created new Postgres database schema: " + colors.Blue(pgDatabase))
+		}
+	} else if t.Profile.Config.Database != nil && t.Profile.Config.Database.Type == "postgres" {
+		// Use Postgres from profile config
+		logger.Info("Using Postgres database from profile configuration")
+		
 		sslMode := t.Profile.Config.Database.SSLMode
 		if sslMode == "" {
 			sslMode = "disable"
@@ -237,6 +272,7 @@ func (t *Teamserver) Start() {
 		}
 	} else {
 		// Use SQLite (default)
+		logger.Info("Using SQLite database (default)")
 		if t.DB, err = db.DatabaseNew(TeamserverPath + "/" + DBPath); err != nil {
 			logger.SetStdOut(os.Stderr)
 			logger.Error("Failed to create or open a database: " + err.Error())

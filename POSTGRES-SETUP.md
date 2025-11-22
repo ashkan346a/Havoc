@@ -7,38 +7,48 @@
 ### 1. پشتیبانی از PostgreSQL
 - کد دیتابیس برای پشتیبانی از PostgreSQL و SQLite به‌روزرسانی شد
 - درایور `github.com/lib/pq` اضافه شد
+- **پشتیبانی خودکار از Environment Variables** برای Railway و Docker
 
-### 2. تنظیمات Profile
-فایل‌های profile جدید:
-- `profiles/havoc.yaotl` - با تنظیمات PostgreSQL به‌روزرسانی شد
-- `profiles/railway-postgres.yaotl` - پیکربندی ویژه Railway
+### 2. الویت بارگذاری Database
+Teamserver به ترتیب زیر دیتابیس را انتخاب می‌کند:
+1. **Environment Variables** (برای Railway, Docker, Kubernetes)
+2. **Profile Configuration** (از فایل .yaotl)
+3. **SQLite** (پیش‌فرض)
 
 ## استفاده در Railway
 
-### متغیرهای محیطی مورد نیاز
+### روش 1: استفاده از Environment Variables (توصیه می‌شود)
+
 Railway این متغیرها را به صورت خودکار تزریق می‌کند:
 
 ```bash
 PGHOST=postgres-nfwo.railway.internal
-PGPORT=5432
+PGPORT=5432  # اختیاری - پیش‌فرض 5432
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=zPeMsQPPrejxBPBUlGGqhpyYrgqTegnr
 PGDATABASE=railway
+PGSSLMODE=disable  # اختیاری - پیش‌فرض disable
 ```
 
-### تنظیمات Profile برای Railway
+**هیچ تغییری در profile لازم نیست!** Teamserver به صورت خودکار این متغیرها را تشخیص می‌دهد.
+
+### روش 2: استفاده از Profile Configuration
+
+اگر می‌خواهید از فایل profile استفاده کنید، Database block را uncomment کنید:
 
 ```toml
 Database {
     Type = "postgres"
-    Host = "${PGHOST}"
-    Port = ${PGPORT}
-    User = "${POSTGRES_USER}"
-    Password = "${POSTGRES_PASSWORD}"
-    Name = "${PGDATABASE}"
+    Host = "postgres-nfwo.railway.internal"
+    Port = 5432
+    User = "postgres"
+    Password = "your_password_here"
+    Name = "railway"
     SSLMode = "disable"
 }
 ```
+
+**نکته:** Yaotl parser از environment variables در فایل profile پشتیبانی نمی‌کند، پس باید مقادیر را hardcode کنید.
 
 ## استفاده Local
 
