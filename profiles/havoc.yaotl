@@ -10,20 +10,23 @@ Teamserver {
 }
 
 # Database configuration
-# Use "sqlite" for local SQLite database (default)
-# Use "postgres" for PostgreSQL database (recommended for production/Railway)
-Database {
-    Type = "postgres"
-    Host = "${PGHOST}"
-    Port = 5432
-    User = "${POSTGRES_USER}"
-    Password = "${POSTGRES_PASSWORD}"
-    Name = "${PGDATABASE}"
-    SSLMode = "disable"
-}
+# NOTE: Yaotl parser does not support environment variables in all contexts
+# For Railway deployment, you'll need to hardcode the database credentials
+# or use a separate configuration method.
+# 
+# To use PostgreSQL, uncomment and configure the Database block below:
+# Database {
+#     Type = "postgres"
+#     Host = "postgres-nfwo.railway.internal"
+#     Port = 5432
+#     User = "postgres"
+#     Password = "zPeMsQPPrejxBPBUlGGqhpyYrgqTegnr"
+#     Name = "railway"
+#     SSLMode = "disable"
+# }
 
-# For local SQLite database, comment out the Database block above
-# and the teamserver will use the default SQLite database
+# For local SQLite database (default - currently active)
+# The teamserver will use SQLite if no Database block is present
 
 Operators {
     user "5pider" {
