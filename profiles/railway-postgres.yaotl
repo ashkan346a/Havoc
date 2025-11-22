@@ -14,7 +14,7 @@ Teamserver {
 Database {
     Type = "postgres"
     Host = "${PGHOST}"                      # postgres-nfwo.railway.internal
-    Port = ${PGPORT}                        # 5432
+    Port = 5432                             # 5432
     User = "${POSTGRES_USER}"               # postgres
     Password = "${POSTGRES_PASSWORD}"       # Your password from Railway
     Name = "${PGDATABASE}"                  # railway

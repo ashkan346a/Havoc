@@ -15,7 +15,7 @@ Teamserver {
 Database {
     Type = "postgres"
     Host = "${PGHOST}"
-    Port = ${PGPORT}
+    Port = 5432
     User = "${POSTGRES_USER}"
     Password = "${POSTGRES_PASSWORD}"
     Name = "${PGDATABASE}"
